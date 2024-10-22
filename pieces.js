@@ -1,46 +1,54 @@
 // Récurpération des pièces depuis le fichier JSON
-const reponse = await fetch("pieces-autos.json")
-const pieces = await reponse.json()
+const pieces = await fetch("pieces-autos.json").then(pieces => pieces.json())
 
 // Création des articles de pieces
-for (let article of pieces) {
-    const imageElement = document.createElement("img")
-    imageElement.src = article.image
-    const nomElement = document.createElement("h2")
-    nomElement.innerText = article.nom
-    const prixElement = document.createElement("p")
-    prixElement.innerText = `Prix: ${article.prix} € (${article.prix < 35 ? "€" : "€€€"})`
-    const categorieElement = document.createElement("p")
-    categorieElement.innerText = article.categorie ?? "* Pas de catégorie"
-    const descriptionElement = document.createElement("p")
-    descriptionElement.innerText = `${article.description ?? "*Pas de description pour le moment"}`
-    const stockElement = document.createElement("p")
-    stockElement.innerText = article.disponibilite ? "En stock" : "En rupture de stock"
+function genererPieces (pieces) {
+    for (let article of pieces) {
+        const imageElement = document.createElement("img")
+        imageElement.src = article.image
+        const nomElement = document.createElement("h2")
+        nomElement.innerText = article.nom
+        const prixElement = document.createElement("p")
+        prixElement.innerText = `Prix: ${article.prix} € (${article.prix < 35 ? "€" : "€€€"})`
+        const categorieElement = document.createElement("p")
+        categorieElement.innerText = article.categorie ?? "* Pas de catégorie"
+        const descriptionElement = document.createElement("p")
+        descriptionElement.innerText = `${article.description ?? "*Pas de description pour le moment"}`
+        const stockElement = document.createElement("p")
+        stockElement.innerText = article.disponibilite ? "En stock" : "En rupture de stock"
 
-    // Rattachement des balises au DOM
-    const sectionFiches = document.querySelector(".fiches")
-    const articleElement = document.createElement("article")
-    articleElement.appendChild(imageElement)
-    articleElement.appendChild(nomElement)
-    articleElement.appendChild(prixElement)
-    articleElement.appendChild(categorieElement)
-    articleElement.appendChild(descriptionElement)
-    articleElement.appendChild(stockElement)
+        // Rattachement des balises au DOM
+        const sectionFiches = document.querySelector(".fiches")
+        const articleElement = document.createElement("article")
+        articleElement.appendChild(imageElement)
+        articleElement.appendChild(nomElement)
+        articleElement.appendChild(prixElement)
+        articleElement.appendChild(categorieElement)
+        articleElement.appendChild(descriptionElement)
+        articleElement.appendChild(stockElement)
 
-    sectionFiches.appendChild(articleElement)
+        sectionFiches.appendChild(articleElement)
+    }
 }
+
+// Premier affichage de la page
+genererPieces(pieces)
 
 // Gestion des boutons
 const boutonTrierCroissant = document.querySelector(".btn-trier-croissant")
 
+// Ajout du listener pour trier les pièces par ordre croissant selon leur prix
 boutonTrierCroissant.addEventListener("click", function () {
     const piecesOrdonnees = Array.from(pieces)
     piecesOrdonnees.sort(function (a, b) {
         return a.prix - b.prix
     })
-    console.log(piecesOrdonnees)
+    // Effacement de l'écran et regénération de la page
+    document.querySelector(".fiches").innerHTML = ""
+    genererPieces (piecesOrdonnees)
 })
 
+// Ajout du listener pour trier les pièces par ordre décroissant selon leur prix
 const boutonTrierDecroissant = document.querySelector(".btn-trier-decroissant")
 
 boutonTrierDecroissant.addEventListener("click", function() {
@@ -48,23 +56,31 @@ boutonTrierDecroissant.addEventListener("click", function() {
     piecesOrdonnees.sort(function (a, b) {
         return b.prix - a.prix
     })
-    console.log(piecesOrdonnees)
+    // Effacement de l'écran et regénération de la page
+    document.querySelector(".fiches").innerHTML = ""
+    genererPieces (piecesOrdonnees)
 })
 
+// Ajout du listener pour filtrer les pieces au prix non abordables
 const boutonFiltrerCheap = document.querySelector(".btn-filtrer-cheap")
 boutonFiltrerCheap.addEventListener("click", function () {
     const piecesFiltrees = pieces.filter (function (piece) {
         return piece.prix <= 35
     })
-    console.log(piecesFiltrees)
+    // Effacement de l'écran et regénération de la page
+    document.querySelector(".fiches").innerHTML = ""
+    genererPieces (piecesFiltrees)
 })
 
+// Ajout du listener pour filtrer les pièces sans description
 const boutonNoDescription = document.querySelector(".btn-filtrer-nodesc")
 boutonNoDescription.addEventListener("click", function () {
     const piecesFiltrees = pieces.filter(function (piece) {
         return piece.description
     })
-    console.log(piecesFiltrees)
+    // Effacement de l'écran et regénération de la page
+    document.querySelector(".fiches").innerHTML = ""
+    genererPieces (piecesFiltrees)
 })
 
 // Récupération des noms des pieces
